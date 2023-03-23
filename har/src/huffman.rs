@@ -36,16 +36,10 @@ pub struct Code(u16, usize); // code as bits and its length
 
 impl fmt::Debug for Code {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut s = String::new();
-        let mut code = *self;
-        while code.1 > 0 {
-            s.push(if (code.0 & 0x01) == 1 { '1' } else { '0' });
-
-            code.0 >>= 1;
-            code.1 -= 1;
+        if self.1 != 0 {
+            return write!(f, "{:width$b}", self.0, width = self.1);
         }
-
-        write!(f, "{}", s.chars().rev().collect::<String>())
+        Ok(())
     }
 }
 
@@ -112,3 +106,19 @@ fn construct_huffman_code_helper(node: &Node, prefix: Code, codes: &mut HashMap<
         construct_huffman_code_helper(right, prefix, codes);
     }
 }
+
+pub fn huffman_encode(codes: &[Code; 256], src: &[u8]) -> (Vec<u8>, usize) {
+    /*
+    let mut result = vec![];
+    let mut tmp = Code(0);
+
+    for a in src {
+        let code = codes[*a as usize];
+
+    }
+    */
+
+    todo!()
+}
+
+pub fn huffman_decode() {}
