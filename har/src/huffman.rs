@@ -1,3 +1,4 @@
+use std::cmp;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
@@ -108,17 +109,37 @@ fn construct_huffman_code_helper(node: &Node, prefix: Code, codes: &mut HashMap<
 }
 
 pub fn huffman_encode(codes: &[Code; 256], src: &[u8]) -> (Vec<u8>, usize) {
-    /*
     let mut result = vec![];
-    let mut tmp = Code(0);
+    let mut d = 0_u8;
+    let mut l = 0_usize;
 
     for a in src {
-        let code = codes[*a as usize];
+        let Code(mut bits, mut length) = codes[*a as usize];
 
+        while length > 0 {
+            let aaa = cmp::min(length, 8 - l);
+            let x = bits >> (length - aaa);
+            let y = x << (8 - l - aaa);
+            d |= y as u8;
+            l += aaa;
+
+            if l == 8 {
+                result.push(d);
+                d = 0;
+                l = 0;
+            }
+
+            length -= aaa;
+            bits = bits << (16 - length) >> (16 - length);
+        }
     }
-    */
 
-    todo!()
+    if l == 0 {
+        (result, 0)
+    } else {
+        result.push(d);
+        (result, 8 - l)
+    }
 }
 
 pub fn huffman_decode() {}
