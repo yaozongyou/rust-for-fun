@@ -38,7 +38,7 @@ pub struct Code(u16, usize); // code as bits and its length
 impl fmt::Debug for Code {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.1 != 0 {
-            return write!(f, "{:width$b}", self.0, width = self.1);
+            return write!(f, "{:0>width$b}", self.0, width = self.1);
         }
         Ok(())
     }
@@ -46,7 +46,6 @@ impl fmt::Debug for Code {
 
 pub fn huffman(frequencies: &[usize; 256]) -> [Code; 256] {
     let root = build_huffman_tree(frequencies);
-    println!("root: {:?}", root);
     construct_huffman_code(root)
 }
 
@@ -130,7 +129,7 @@ pub fn huffman_encode(codes: &[Code; 256], src: &[u8]) -> (Vec<u8>, usize) {
             }
 
             length -= aaa;
-            bits = bits << (16 - length) >> (16 - length);
+            bits = bits << ((16 - length) % 16) >> ((16 - length) % 16);
         }
     }
 
@@ -143,3 +142,32 @@ pub fn huffman_encode(codes: &[Code; 256], src: &[u8]) -> (Vec<u8>, usize) {
 }
 
 pub fn huffman_decode() {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(format!("{:?}", Code(0b00, 2)), "00");
+        assert_eq!(format!("{:?}", Code(0b01, 2)), "01");
+        assert_eq!(format!("{:?}", Code(0b101, 3)), "101");
+
+        let mut frequencies = [0; 256];
+        frequencies['f' as usize] = 5;
+        frequencies['e' as usize] = 9;
+        frequencies['c' as usize] = 12;
+        frequencies['b' as usize] = 13;
+        frequencies['d' as usize] = 16;
+        frequencies['a' as usize] = 45;
+        let codes = huffman(&frequencies);
+        assert_eq!(format!("{:?}", codes['a' as usize]), "0");
+        assert_eq!(format!("{:?}", codes['b' as usize]), "101");
+        assert_eq!(format!("{:?}", codes['c' as usize]), "100");
+        assert_eq!(format!("{:?}", codes['d' as usize]), "111");
+        assert_eq!(format!("{:?}", codes['e' as usize]), "1101");
+        assert_eq!(format!("{:?}", codes['f' as usize]), "1100");
+
+        assert_eq!(huffman_encode(&codes, "abc".as_bytes()), (vec![0b01011000], 1));
+    }
+}

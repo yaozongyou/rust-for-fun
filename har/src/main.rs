@@ -8,9 +8,9 @@ fn main() {
     frequencies['b' as usize] = 13;
     frequencies['d' as usize] = 16;
     frequencies['a' as usize] = 45;
-    println!("frequencies: {:?}", frequencies);
+    println!("frequencies: {frequencies:?}");
     let codes = huffman::huffman(&frequencies);
-    println!("codes: {:?}", codes);
+    println!("codes: {codes:?}");
 
     println!("Hello, world!");
 }
