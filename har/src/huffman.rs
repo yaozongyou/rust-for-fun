@@ -107,16 +107,16 @@ fn construct_huffman_code_helper(node: &Node, prefix: Code, codes: &mut HashMap<
     }
 }
 
-pub fn huffman_encode(codes: &[Code; 256], src: &[u8]) -> (Vec<u8>, usize) {
+pub fn huffman_encode(codes: &[Code; 256], symbols: &[u8]) -> (Vec<u8>, usize) {
     let mut result = vec![];
     let mut d = 0_u8;
     let mut l = 0_usize;
 
-    for a in src {
-        let Code(mut bits, mut length) = codes[*a as usize];
+    for symbol in symbols {
+        let Code(mut bits, mut length) = codes[*symbol as usize];
 
         while length > 0 {
-            let aaa = cmp::min(length, 8 - l);
+            let aaa = cmp::min(length, u8::BITS as usize - l);
             let x = bits >> (length - aaa);
             let y = x << (8 - l - aaa);
             d |= y as u8;
@@ -141,7 +141,7 @@ pub fn huffman_encode(codes: &[Code; 256], src: &[u8]) -> (Vec<u8>, usize) {
     }
 }
 
-pub fn huffman_decode() {}
+pub fn huffman_decode(codes: &[Code; 256]) {}
 
 #[cfg(test)]
 mod tests {
