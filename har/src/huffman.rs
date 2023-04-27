@@ -141,7 +141,44 @@ pub fn huffman_encode(codes: &[Code; 256], symbols: &[u8]) -> (Vec<u8>, usize) {
     }
 }
 
-pub fn huffman_decode(codes: &[Code; 256]) {}
+pub fn huffman_decode(codes: &[Code; 256], words: &[u8], padding: usize) -> Vec<u8> {
+    let bits_total = words.len() * u8::BITS as usize - padding;
+    let mut bit_consumed = 0usize;
+    let mut symbols = vec![];
+
+    println!("bits_total: {}", bits_total);
+
+    while bit_consumed < bits_total {
+        for (i, code) in codes.iter().enumerate() {
+            if code.1 > (bits_total - bit_consumed) {
+                continue;
+            }
+
+            if code.1 == 0 {
+                continue;
+            }
+
+            let mut aaa = 0u16;
+            let bbb = code.1;
+
+            for x in 1..=bbb {
+                let ccc = words[(bit_consumed + x) / 8];
+                let ddd = (ccc >> ((8 - ((bit_consumed + x) % 8)) % 8)) & 0x01;
+                aaa = (aaa << 1) | ddd as u16;
+            }
+
+            if aaa == code.0 {
+                println!("{aaa} {bbb}");
+                bit_consumed += code.1;
+                symbols.push(i as u8);
+                println!("bit_consumed {} symbols: {:?}", bit_consumed, symbols);
+                break;
+            }
+        }
+    }
+
+    symbols
+}
 
 #[cfg(test)]
 mod tests {
@@ -169,5 +206,6 @@ mod tests {
         assert_eq!(format!("{:?}", codes['f' as usize]), "1100");
 
         assert_eq!(huffman_encode(&codes, "abc".as_bytes()), (vec![0b01011000], 1));
+        assert_eq!(huffman_decode(&codes, &vec![0b01011000], 1), "abc".as_bytes().to_vec());
     }
 }
