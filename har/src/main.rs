@@ -30,5 +30,5 @@ fn main() {
     assert_eq!(format!("{:?}", codes['f' as usize]), "1100");
 
     assert_eq!(huffman::huffman_encode(&codes, "abc".as_bytes()), (vec![0b01011000], 1));
-    assert_eq!(huffman::huffman_decode(&codes, &vec![0b01011000], 1), vec![]);
+    assert_eq!(huffman::huffman_decode(&codes, &[0b01011000], 1), "abc".as_bytes().to_vec());
 }

@@ -146,8 +146,6 @@ pub fn huffman_decode(codes: &[Code; 256], words: &[u8], padding: usize) -> Vec<
     let mut bit_consumed = 0usize;
     let mut symbols = vec![];
 
-    println!("bits_total: {}", bits_total);
-
     while bit_consumed < bits_total {
         for (i, code) in codes.iter().enumerate() {
             if code.1 > (bits_total - bit_consumed) {
@@ -168,10 +166,8 @@ pub fn huffman_decode(codes: &[Code; 256], words: &[u8], padding: usize) -> Vec<
             }
 
             if aaa == code.0 {
-                println!("{aaa} {bbb}");
                 bit_consumed += code.1;
                 symbols.push(i as u8);
-                println!("bit_consumed {} symbols: {:?}", bit_consumed, symbols);
                 break;
             }
         }
@@ -206,6 +202,6 @@ mod tests {
         assert_eq!(format!("{:?}", codes['f' as usize]), "1100");
 
         assert_eq!(huffman_encode(&codes, "abc".as_bytes()), (vec![0b01011000], 1));
-        assert_eq!(huffman_decode(&codes, &vec![0b01011000], 1), "abc".as_bytes().to_vec());
+        assert_eq!(huffman_decode(&codes, &[0b01011000], 1), "abc".as_bytes().to_vec());
     }
 }
